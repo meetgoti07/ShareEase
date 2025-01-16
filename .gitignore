@@ -1,0 +1,57 @@
+# General
+*.DS_Store
+*.log
+*.env
+*.env.local
+*.env.*.local
+.vscode/
+.idea/
+node_modules/
+dist/
+build/
+*.lock
+
+# Frontend (Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*.local
+frontend/package-lock.json
+frontend/yarn.lock
+frontend/pnpm-lock.yaml
+
+# Django
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.pyd
+backend/env/
+backend/venv/
+backend/.env
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.coverage
+backend/coverage/
+backend/htmlcov/
+backend/.vscode/
+backend/.idea/
+backend/celerybeat-schedule
+
+# Logs and Debugging
+*.log
+*.log.*
+*.out
+*.err
+
+# OS Generated
+Thumbs.db
+.DS_Store
+*.swp
+*.swo
+
+# Ignore by convention
+*.bak
+*.tmp

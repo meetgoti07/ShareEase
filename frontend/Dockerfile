@@ -12,7 +12,7 @@ COPY index.html .
 COPY components.json .
 COPY tailwind.config.js .
 COPY postcss.config.js .
-COPY .env .
+COPY ../.env .
 
 COPY tsconfig.app.json .
 COPY tsconfig.node.json .
