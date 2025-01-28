@@ -28,11 +28,11 @@ service = "django"
 rule = "PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
 entrypoints = ["web"]
 
-
 [http.routers.react]
 service = "react"
 rule = "PathPrefix(`/`)"
 entrypoints = ["web"]
+
 
 [http.services]
 [http.services.react.loadBalancer]

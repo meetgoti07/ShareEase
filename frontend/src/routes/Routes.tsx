@@ -3,32 +3,63 @@ import { AuthChangeRedirector, AnonymousRoute, AuthenticatedRoute } from '@/auth
 import {
     createBrowserRouter,
     RouterProvider,
-    RouteObject
+    RouteObject, Outlet
 } from 'react-router-dom'
 
 import { useConfig } from '@/auth'
-import Login from "@/pages/Login.tsx";
-import ProviderCallback from "@/pages/ProviderCallback.tsx";
-import {Home} from "@/pages/Home.tsx";
+import Login from "@/pages/Login/Login.tsx";
+import ProviderCallback from "@/pages/Login/ProviderCallback.tsx";
+import {Profile} from "@/pages/Profile/Profile.tsx";
+import {AddProductForm} from "@/pages/shop/Product/AddProduct.tsx";
 
-function createRouter(config: any): ReturnType<typeof createBrowserRouter> {
+import {Home} from "@/pages/Home.tsx";
+import {Shop} from "@/pages/shop/Product/Shop.tsx";
+import {Rent} from "@/pages/rent/Rent.tsx";
+import AddCategory from "@/pages/shop/Category/Categories.tsx";
+import {ShowProduct} from "@/pages/shop/Product/ShowProduct.tsx";
+
+function createRouter(): ReturnType<typeof createBrowserRouter> {
     const routes: RouteObject[] = [
         {
             path: '/',
-            element: <AuthChangeRedirector><Login /></AuthChangeRedirector>,
+            element: <AuthChangeRedirector><Outlet/></AuthChangeRedirector>,
             children: [
                 {
                     path: '/',
+                    element: <AuthenticatedRoute><Home/></AuthenticatedRoute>
+                },
+                {
+                    path: '/login',
                     element: <AnonymousRoute><Login /></AnonymousRoute>
                 },
-              {
-                path: '/dashboard',
-                element: <AuthenticatedRoute><Home /></AuthenticatedRoute>
-              },
                 {
                     path: '/account/provider/callback',
                     element: <ProviderCallback />
                 },
+                {
+                    path:'/profile',
+                    element: <AuthenticatedRoute><Profile/></AuthenticatedRoute>
+                },
+                {
+                    path: '/sell/add-product',
+                    element: <AuthenticatedRoute><AddProductForm /></AuthenticatedRoute>
+                },
+                {
+                    path: '/shop/:id',
+                    element: <AuthenticatedRoute><ShowProduct /></AuthenticatedRoute>
+                },
+                {
+                    path:'/shop/',
+                    element:<AuthenticatedRoute><Shop/></AuthenticatedRoute>
+                },
+                {
+                    path:'/rent/',
+                    element:<AuthenticatedRoute><Rent/></AuthenticatedRoute>
+                },
+                {
+                    path:"/admin/add-category",
+                    element:<AuthenticatedRoute><AddCategory/></AuthenticatedRoute>
+                }
             ]
         }
     ]
@@ -41,7 +72,7 @@ export default function Router(): JSX.Element | null {
     const config = useConfig()
 
     useEffect(() => {
-        setRouter(createRouter(config))
+        setRouter(createRouter())
     }, [config])
 
     return router ? <RouterProvider router={router} /> : null

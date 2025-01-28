@@ -69,6 +69,8 @@ export const URLs: { [key: string]: string } = Object.freeze({
     // Auth: Sessions
     SESSIONS: BASE_URL + '/auth/sessions',
 
+    USERMETA: 'http://localhost:10000/_allauth/api/profile/',
+
     // Auth: WebAuthn
     REAUTHENTICATE_WEBAUTHN: BASE_URL + '/auth/webauthn/reauthenticate',
     AUTHENTICATE_WEBAUTHN: BASE_URL + '/auth/webauthn/authenticate',
@@ -101,7 +103,7 @@ function postForm(action: string, data: { [key: string]: string }): void {
 
 const tokenStorage: Storage = window.sessionStorage
 
-async function request(
+export async function request(
     method: string,
     path: string,
     data?: never,
@@ -156,10 +158,6 @@ export async function logout(): Promise<never> {
     return await request('DELETE', URLs.SESSION)
 }
 
-export async function providerSignup (data) {
-    return await request('POST', URLs.PROVIDER_SIGNUP, data)
-}
-
 export async function getConfig () {
     return await request('GET', URLs.CONFIG)
 }
@@ -179,4 +177,9 @@ export function redirectToProvider (providerId:any , callbackURL:any, process = 
     })
 }
 
-
+export async function getUserMeta() {
+    return await request('GET', URLs.USERMETA);
+}
+export async function setUserMeta(data :any) {
+    return await request('PUT', URLs.USERMETA, data);
+}

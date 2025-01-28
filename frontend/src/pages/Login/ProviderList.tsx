@@ -37,7 +37,7 @@ export default function ProviderList(props: ProviderListProps): JSX.Element | nu
                     return (
                         <li key={provider.id}>
                             <Button
-                                onClick={() => redirectToProvider(provider.id, props.callbackURL, props.process)}
+                                onClick={() => redirectToProvider(provider.id, props.callbackURL)}
                             >
                                 {provider.name}
                             </Button>

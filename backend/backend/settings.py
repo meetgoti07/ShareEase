@@ -32,6 +32,9 @@ INSTALLED_APPS = [
     "allauth.mfa",
     "allauth.headless",
     "allauth.usersessions",
+    "user",
+    "product",
+#     "rent"
 ]
 
 MIDDLEWARE = [
@@ -44,6 +47,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
+
+
+# settings.py
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'user.serializers.CustomRegisterSerializer',
+}
 
 ROOT_URLCONF = "backend.urls"
 
@@ -75,6 +84,17 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'neondb',
+#         'USER': 'neondb_owner',
+#         'PASSWORD': 'sQmwZBD36frx',
+#         'HOST': 'ep-snowy-bread-a18qwap4-pooler.ap-southeast-1.aws.neon.tech',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation

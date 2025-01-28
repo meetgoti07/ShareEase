@@ -20,10 +20,9 @@ export function LoginForm(){
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">
-              <li key='google'>
+
                 <Button variant="outline" className="w-full"
                 onClick={() => redirectToProvider("google", "/account/provider/callback")}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -34,10 +33,8 @@ export function LoginForm(){
                   </svg>
                   Login with Google
                 </Button>
-              </li>
               </div>
             </div>
-          </form>
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
