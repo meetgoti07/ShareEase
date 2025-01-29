@@ -73,7 +73,7 @@ const data = {
     },
     {
       title: "List Property",
-      url: "/rent",
+      url: "/rent/add-property",
       icon: LandPlot,
     },
   ]

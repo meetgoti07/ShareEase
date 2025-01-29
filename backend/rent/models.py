@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class House(models.Model):
+class Property(models.Model):
     title = models.CharField(max_length=255)  # E.g., "2 BHK near College"
     description = models.TextField()  # Detailed description of the house
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='houses')
@@ -15,6 +15,6 @@ class House(models.Model):
     available_vacancy = models.PositiveIntegerField()
     sharing = models.PositiveIntegerField()
     is_available = models.BooleanField(default=True)  # Availability status
-    custom_features = models.TextField(blank=True, null=True)  # Store custom fields as a JSON string
+    custom_features = models.JSONField(blank=True, null=True)  # Store custom fields as a JSON string
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

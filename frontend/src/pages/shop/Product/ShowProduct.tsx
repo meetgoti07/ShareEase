@@ -43,7 +43,7 @@ export const ShowProduct = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-8">
                 {/* Left Column - Image Carousel */}
                 <div className="flex content-center align-middle justify-center">
-                    <Carousel>
+                    <Carousel >
                         <CarouselContent>
                             {product.images.map((image, index) => (
                                 <CarouselItem key={index}>
@@ -93,7 +93,7 @@ export const ShowProduct = () => {
                         {product.extra_features.length > 0 ? (
                             <ul className="list-disc list-inside">
                                 {product.extra_features.map((feature, index) => (
-                                    <li key={index}>{feature}</li>
+                                    <li key={index}>{feature.value}</li>
                                 ))}
                             </ul>
                         ) : (

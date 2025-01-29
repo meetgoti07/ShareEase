@@ -14,9 +14,10 @@ import {AddProductForm} from "@/pages/shop/Product/AddProduct.tsx";
 
 import {Home} from "@/pages/Home.tsx";
 import {Shop} from "@/pages/shop/Product/Shop.tsx";
-import {Rent} from "@/pages/rent/Rent.tsx";
+import {PropertyList} from "@/pages/rent/Rent.tsx";
 import AddCategory from "@/pages/shop/Category/Categories.tsx";
 import {ShowProduct} from "@/pages/shop/Product/ShowProduct.tsx";
+import {AddPropertyForm} from "@/pages/rent/AddProperty.tsx";
 
 function createRouter(): ReturnType<typeof createBrowserRouter> {
     const routes: RouteObject[] = [
@@ -54,7 +55,11 @@ function createRouter(): ReturnType<typeof createBrowserRouter> {
                 },
                 {
                     path:'/rent/',
-                    element:<AuthenticatedRoute><Rent/></AuthenticatedRoute>
+                    element:<AuthenticatedRoute><PropertyList/></AuthenticatedRoute>
+                },
+                {
+                    path:'/rent/add-property',
+                    element:<AuthenticatedRoute><AddPropertyForm/></AuthenticatedRoute>
                 },
                 {
                     path:"/admin/add-category",

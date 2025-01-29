@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     "allauth.usersessions",
     "user",
     "product",
-#     "rent"
+    "rent"
 ]
 
 MIDDLEWARE = [

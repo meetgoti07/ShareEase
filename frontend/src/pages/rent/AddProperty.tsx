@@ -1,11 +1,9 @@
 "use client";
 
 import * as z from "zod";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
 
-// Import Shadcn UI form components
 import {
     Form,
     FormField,
@@ -13,36 +11,34 @@ import {
     FormLabel,
     FormControl,
     FormMessage,
-} from "@/components/ui/form.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { Textarea } from "@/components/ui/textarea.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import Layout from "@/layout/Layout.tsx";
-import {addProduct, getCategories} from "@/pages/shop/api/api.tsx";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import Layout from "@/layout/Layout";
+import { useToast } from "@/hooks/use-toast";
 
 import { v4 as uuidv4 } from 'uuid';
-import { useToast} from "@/hooks/use-toast.ts";
-
-
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://puyvmepvpbbvsajxlkju.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1eXZtZXB2cGJidnNhanhsa2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcwNDE2MDksImV4cCI6MjA1MjYxNzYwOX0.9AHjLae8sgEzV_8B-O_4mRWsQcvb_LtWybCMgy6___I';
-export const supabase = createClient(supabaseUrl, supabaseKey);
-
+import {supabase} from "@/pages/shop/Product/AddProduct.tsx";
+import {addProperty} from "@/pages/rent/api/api.tsx";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 // Define the schema for form validation using zod
-const productSchema = z.object({
+const propertySchema = z.object({
+    id: z.string().optional(),
     title: z.string().min(1, { message: "Title is required." }),
     description: z.string().min(1, { message: "Description is required." }),
-    category: z.string().min(1, { message: "Category ID is required." }),
-    brand: z.string().min(1, { message: "Brand is required." }),
-    quantity: z.number().min(0, "Quantity cannot be negative").default(0),
-    mrp: z.number().min(0, { message: "MRP cannot be negative." }),
-    selling_price: z.number().min(0, { message: "Price cannot be negative." }),
-    is_ad: z.boolean().default(false),
+    location: z.string().min(1, { message: "Location is required." }),
     images: z.array(z.instanceof(File)).min(1, { message: "At least one image is required" }),
-    extra_features: z.array(
+    rent_per_month: z.number().min(0, { message: "Rent cannot be negative." }),
+    security_deposit: z.number().min(0, { message: "Security deposit cannot be negative." }),
+    furnished: z.boolean().default(false),
+    total_vacancy: z.number().min(1, { message: "Total vacancy must be at least 1" }),
+    available_vacancy: z.number().min(0, { message: "Available vacancy cannot be negative" }),
+    sharing: z.number().min(1, { message: "Sharing must be at least 1" }),
+    custom_features: z.array(
         z.object({
             key: z.string().min(1, "Feature key is required"),
             value: z.string().min(1, "Feature value is required"),
@@ -50,33 +46,26 @@ const productSchema = z.object({
     ).optional(),
 });
 
+type PropertyFormValues = z.infer<typeof propertySchema>;
 
+export function AddPropertyForm() {
+    const { toast } = useToast();
 
-type ProductFormValues = z.infer<typeof productSchema>;
-
-export function AddProductForm() {
-    const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
-    const {toast} = useToast();
-
-    const form = useForm<ProductFormValues>({
-        resolver: zodResolver(productSchema),
+    const form = useForm<PropertyFormValues>({
+        resolver: zodResolver(propertySchema),
         defaultValues: {
             title: "",
             description: "",
-            category: "",
-            brand: "",
-            quantity: 0,
-            mrp: 0,
-            selling_price: 0,
-            is_ad: false,
+            location: "",
             images: [],
-            extra_features: [],
+            rent_per_month: 0,
+            security_deposit: 0,
+            furnished: false,
+            total_vacancy: 1,
+            available_vacancy: 1,
+            sharing: 1,
+            custom_features: [],
         },
-    });
-
-    const { fields: featureFields, append, remove } = useFieldArray({
-        control: form.control,
-        name: "extra_features",
     });
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,31 +81,13 @@ export function AddProductForm() {
         form.setValue("images", currentImages.filter((_, i) => i !== index));
     };
 
-    useEffect(() => {
-        // Fetch categories from API
-        async function fetchCategories() {
-            try {
-                const data = await getCategories();
-                setCategories(data);
-            } catch (error) {
-                toast({
-                    variant: "destructive",
-                    title: "Error Fetching Categories",
-                })
-                console.log("Error fetching categories:", error);
-            }
-        }
-
-        fetchCategories();
-    }, []);
-
     const uploadImage = async (file: File) => {
-        const fileExt = file.name.split('.').pop(); // Get file extension
-        const uniqueFileName = `${uuidv4()}.${fileExt}`; // Generate UUID-based filename
+        const fileExt = file.name.split('.').pop();
+        const uniqueFileName = `${uuidv4()}.${fileExt}`;
 
         const { data, error } = await supabase.storage
             .from('products')
-            .upload(`products/${uniqueFileName}`, file, {
+            .upload(`properties/${uniqueFileName}`, file, {
                 cacheControl: '3600',
                 upsert: false,
             });
@@ -126,52 +97,53 @@ export function AddProductForm() {
                 variant: "destructive",
                 title: "Error Uploading Images",
                 description: error.toString(),
-            })
+            });
         }
 
         return data;
     };
 
-    async function onSubmit(values: ProductFormValues) {
+    async function onSubmit(values: PropertyFormValues) {
         try {
-            console.log("Submitting Product:", values);
+            console.log("Submitting Property:", values);
 
             const imageUrls = await Promise.all(values.images.map(async (file) => {
                 const paths = await uploadImage(file);
                 const path = paths?.path;
                 const { data } = supabase.storage.from("products").getPublicUrl(path || "Unknown");
-
                 return data.publicUrl;
             }));
 
-            const productData = {
+            const propertyData = {
                 ...values,
                 images: imageUrls,
             };
-
-            const data = await addProduct(productData);
-            if(data) {
-                toast({
-                    title: "Product Added Successfully!",
-                    description: "Wait For Approval"
-
-                })
-                //reset the form
-                form.reset();
+            console.log(propertyData.images);
+            // Add your API call here to save the property
+            if(propertyData.images.length > 0) {
+                const data: PropertyFormValues = await addProperty(propertyData);
+                if (data.id) {
+                    toast({
+                        title: "Property Listed Successfully!",
+                        description: "Your property has been listed for review"
+                    });
+                    form.reset();
+                }
+            } else {
+                throw error;
             }
         } catch (error) {
-            console.log("Error adding product:", error);
+            console.log("Error adding property:", error);
             toast({
                 variant: "destructive",
-                title: "Error Fetching Categories",
-            })
+                title: "Error Adding Property",
+            });
         }
     }
 
-
     return (
         <Layout>
-            <div className='p-2 w-3/4'>
+            <div className="p-2 w-3/4">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         {/* Title */}
@@ -180,9 +152,9 @@ export function AddProductForm() {
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Title</FormLabel>
+                                    <FormLabel>Property Title</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Product title" {...field} />
+                                        <Input placeholder="e.g., 2 BHK near College" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -197,62 +169,39 @@ export function AddProductForm() {
                                 <FormItem>
                                     <FormLabel>Description</FormLabel>
                                     <FormControl>
-                                        <Textarea placeholder="Product description" {...field} />
+                                        <Textarea placeholder="Detailed description of the property" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        {/* Category Select */}
-                        <div className='grid grid-cols-2 gap-4'>
+                        {/* Location */}
                         <FormField
                             control={form.control}
-                            name="category"
+                            name="location"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Category</FormLabel>
+                                    <FormLabel>Location</FormLabel>
                                     <FormControl>
-                                        <select {...field} className="w-full p-2 border rounded">
-                                            <option value="">Select a category</option>
-                                            {categories.map(category => (
-                                                <option key={category.id} value={category.id}>
-                                                    {category.name}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <Textarea placeholder="Full address of the property" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        {/* Brand */}
-                        <FormField
-                            control={form.control}
-                            name="brand"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Brand</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Brand name" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        </div>
-                        {/* Pricing Section */}
+                        {/* Rent and Deposit Section */}
                         <div className="grid grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
-                                name="mrp"
+                                name="rent_per_month"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>MRP (Maximum Retail Price)</FormLabel>
+                                        <FormLabel>Monthly Rent</FormLabel>
                                         <FormControl>
                                             <Input
-                                                type="text"
+                                                type="number"
                                                 {...field}
                                                 onChange={e => field.onChange(Number(e.target.value))}
                                             />
@@ -264,31 +213,10 @@ export function AddProductForm() {
 
                             <FormField
                                 control={form.control}
-                                name="selling_price"
+                                name="security_deposit"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Selling Price</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        {/* Quantity and Ad Checkbox */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="quantity"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Stock Quantity</FormLabel>
+                                        <FormLabel>Security Deposit</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -302,14 +230,92 @@ export function AddProductForm() {
                             />
                         </div>
 
-                        {/* Image URLs */}
+                        {/* Vacancy and Sharing Section */}
+                        <div className="grid grid-cols-3 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="total_vacancy"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Total Rooms</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                {...field}
+                                                onChange={e => field.onChange(Number(e.target.value))}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="available_vacancy"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Available Rooms</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                {...field}
+                                                onChange={e => field.onChange(Number(e.target.value))}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="sharing"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Sharing (per room)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                {...field}
+                                                onChange={e => field.onChange(Number(e.target.value))}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        {/* Toggle Switches */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="furnished"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                        <div className="space-y-0.5">
+                                            <FormLabel>Furnished</FormLabel>
+                                        </div>
+                                        <FormControl>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        {/* Images */}
                         <div>
                             <FormField
                                 control={form.control}
                                 name="images"
                                 render={() => (
                                     <FormItem>
-                                        <FormLabel>Upload Images</FormLabel>
+                                        <FormLabel>Upload Property Images</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="file"
@@ -342,53 +348,7 @@ export function AddProductForm() {
                             </div>
                         </div>
 
-                        {/* Extra Features */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-2">Product Features</h3>
-                            {featureFields.map((item, index) => (
-                                <div key={item.id} className="flex gap-2 mb-2">
-                                    <FormField
-                                        control={form.control}
-                                        name={`extra_features.${index}.key`}
-                                        render={({field}) => (
-                                            <FormItem className="flex-1">
-                                                <FormControl>
-                                                    <Input placeholder="Feature name" {...field} />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name={`extra_features.${index}.value`}
-                                        render={({field}) => (
-                                            <FormItem className="flex-1">
-                                                <FormControl>
-                                                <Input placeholder="Feature value" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        onClick={() => remove(index)}
-                                    >
-                                        Remove
-                                    </Button>
-                                </div>
-                            ))}
-                            <Button
-                                type="button"
-                                onClick={() => append({ key: "", value: "" })}
-                            >
-                                Add Feature
-                            </Button>
-                        </div>
-
-                        <Button type="submit">Create Product</Button>
+                        <Button type="submit">List Property</Button>
                     </form>
                 </Form>
             </div>

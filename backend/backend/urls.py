@@ -7,5 +7,6 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("_allauth/", include("allauth.headless.urls")),
     path("_allauth/api/", include("user.urls")),
-    path("_allauth/api/", include("product.urls"))
+    path("_allauth/api/", include("product.urls")),
+    path("_allauth/api/", include("rent.urls"))
 ]
