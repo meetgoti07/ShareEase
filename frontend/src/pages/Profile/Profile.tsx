@@ -9,7 +9,7 @@ export function Profile() {
 
     return (
         <Layout>
-            <div className='w-1/2'>
+            <div>
                 <ProfileForm/>
             </div>
         </Layout>

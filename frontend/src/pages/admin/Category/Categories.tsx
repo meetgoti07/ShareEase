@@ -10,15 +10,15 @@ import {
     FormLabel,
     FormControl,
     FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import Layout from "@/layout/Layout";
-import { addCategory, getCategories, editCategory, deleteCategory } from "@/pages/shop/api/api.tsx";
-import { EditCategoryForm } from "./EditCategoryForm";
-import { categorySchema, CategoryFormValues } from "../schema.ts";
+} from "@/components/ui/form.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
+import Layout from "@/layout/Layout.tsx";
+import { addCategory, getCategories, editCategory, deleteCategory } from "../api/api.tsx";
+import { EditCategoryForm } from "./EditCategoryForm.tsx";
+import { categorySchema, CategoryFormValues } from "../../shop/schema.ts";
 
 export default function ManageCategories() {
     // Fixed the state type to CategoryFormValues[]
@@ -118,7 +118,7 @@ export default function ManageCategories() {
     };
     return (
         <Layout>
-            <div className="grid grid-cols-10 gap-6 p-6">
+            <div className="w-full flex flex-col md:grid grid-cols-10 gap-6 p-6">
                 {/* Sidebar (Add Category Form) */}
                 <div className="col-span-3">
                     <h2 className="text-xl font-bold mb-4">Add New Category</h2>
@@ -219,6 +219,7 @@ export default function ManageCategories() {
             {/* Edit Category Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent>
+                    <DialogTitle></DialogTitle>
                     <DialogHeader>
                         <DialogTitle>Edit Category</DialogTitle>
                     </DialogHeader>

@@ -5,7 +5,7 @@ import {getProduct} from "@/pages/shop/api/api.tsx";
 
 import {
     Card,
-    CardContent,
+    CardContent, CardHeader, CardTitle,
 } from "@/components/ui/card";
 import {
     Carousel,
@@ -15,6 +15,9 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import Layout from "@/layout/Layout.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {HeartIcon} from "lucide-react";
+import {Badge} from "@/components/ui/badge.tsx";
 
 export const ShowProduct = () => {
 
@@ -35,7 +38,6 @@ export const ShowProduct = () => {
     if (!product) {
         return <p>Loading...</p>;
     }
-
     return (
         <Layout>
         <div className="container p-10">
@@ -55,59 +57,74 @@ export const ShowProduct = () => {
                                                     alt={`Product image ${index + 1}`}
                                                     className="w-full h-full object-cover"
                                                 />
+                                                {product.is_ad &&
+                                                    <div className="absolute top-2 right-3 space-x-">
+                                                        <Badge variant={"default"}>
+                                                            {"Featured"}
+                                                        </Badge>
+                                                    </div>
+                                                }
+
                                             </CardContent>
                                         </Card>
                                     </div>
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious />
-                        <CarouselNext />
+                        <CarouselPrevious/>
+                        <CarouselNext/>
                     </Carousel>
                 </div>
 
                 {/* Right Column - Features and Details */}
-                <div className="space-y-6">
+                <div className="space-y-4">
+                    {/*Featured Product Badge*/}
                     <div>
+                        <p className="text-sm text-gray-600">{product.brand}</p>
                         <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
-                        <p className="text-lg text-gray-600">Brand: {product.brand}</p>
+                        <div className='flex gap-3'>
+                            <p className="text-xl font-semibold mb-4">₹{product.selling_price}</p>
+                            <p className="text-xl font-semibold mb-4 line-through text-red-700">₹{product.mrp}</p>
+                        </div>
+                        <p className="text-sm text-gray-600">Listed By: {product.owner}</p>
+
                     </div>
 
                     <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <span className="text-lg">MRP:</span>
-                            <span className="text-lg font-semibold">₹{product.mrp}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-lg">Selling Price:</span>
-                            <span className="text-lg font-semibold text-green-600">₹{product.selling_price}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-lg">Quantity Available:</span>
-                            <span className="text-lg">{product.quantity}</span>
+                        <div className='flex gap-3'>
+                            <Button>Buy Now</Button>
+
+                            <Button variant={null}>
+                                <HeartIcon className="w-6 h-6" />
+                            </Button>
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <h2 className="text-xl font-semibold">Additional Features</h2>
-                        {product.extra_features.length > 0 ? (
-                            <ul className="list-disc list-inside">
-                                {product.extra_features.map((feature, index) => (
-                                    <li key={index}>{feature.value}</li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-gray-500">No additional features listed</p>
-                        )}
+                        <Card className='shadow-none border border-gray-300 rounded-lg'>
+                            <CardHeader>
+                                <CardTitle className='text-xl'>Product Features</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <dl className="grid grid-cols-2 gap-4">
+                                    {product.extra_features.map(({key,value}, index) => (
+                                        <div key={index}>
+                                            <dt className="font-semibold">{key}</dt>
+                                            <dd>{value}</dd>
+                                        </div>
+                                    ))}
+                                </dl>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </div>
 
             {/* Second Row - Description */}
             <div className="mt-8">
-                <Card>
-                    <CardContent className="p-6">
-                        <h2 className="text-2xl font-semibold mb-4">Product Description</h2>
+                <Card className='shadow-none border border-gray-300 rounded-lg'>
+                    <CardContent className="p-6 ">
+                        <h2 className="text-xl font-semibold mb-4">Product Description</h2>
                         <p className="text-gray-700">{product.description}</p>
                     </CardContent>
                 </Card>
@@ -116,3 +133,5 @@ export const ShowProduct = () => {
         </Layout>
     );
 };
+
+

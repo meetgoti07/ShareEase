@@ -1,0 +1,1 @@
+from ...meilisearch_integration import SyncMeilisearchCommand as Command

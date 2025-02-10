@@ -1,4 +1,5 @@
 version: "3"
+
 services:
   frontend:
     container_name: frontend
@@ -19,18 +20,33 @@ services:
       - ../../allauth:/code/allauth
     ports:
       - 8000:8000
+    depends_on:
+      - meilisearch
 
   proxy:
     image: traefik:v3.0
     container_name: proxy
     ports:
-      - 10000:10000
+      - "10000:10000"
     volumes:
       - ./traefik.toml:/etc/traefik/traefik.toml
+    depends_on:
+      - backend
+      - meilisearch
 
   mail:
     container_name: mail
     image: schickling/mailcatcher
     ports:
-      - 1080:1080
-      - 1025:1025
+      - "1080:1080"
+      - "1025:1025"
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.3
+    container_name: meilisearch
+    restart: always
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_MASTER_KEY=8OYFXXO8qCT9JJVKyrbu2F0OssR-DvMbh1Ci5UeoPvE
+      - MEILI_HTTP_ROOT=/_search

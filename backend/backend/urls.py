@@ -8,5 +8,7 @@ urlpatterns = [
     path("_allauth/", include("allauth.headless.urls")),
     path("_allauth/api/", include("user.urls")),
     path("_allauth/api/", include("product.urls")),
-    path("_allauth/api/", include("rent.urls"))
+    path("_allauth/api/", include("property.urls")),
+    path("_allauth/api/", include("search.urls")),
+    path("_allauth/api/", include("admin_panel.urls"))
 ]

@@ -31,6 +31,10 @@ class ProductSerializer(serializers.ModelSerializer):
         allow_empty=True,
         write_only=True
     )
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        write_only=True  # Accept category ID in request but don't return it
+    )
 
     class Meta:
         model = Product
@@ -39,28 +43,24 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        # Convert comma-separated images string to array
-        if instance.images:
-            representation['images'] = instance.images.split(',')
-        else:
-            representation['images'] = []
-        
+
+        # Convert category ID to category name in response
+        if instance.category:
+            representation['category'] = instance.category.name  # Return category name instead of ID
+
+        # Convert comma-separated images string to an array
+        representation['images'] = instance.images.split(',') if instance.images else []
+
         # Deserialize extra_features JSON string to a list of objects
-        if instance.extra_features:
-            try:
-                representation['extra_features'] = json.loads(instance.extra_features)
-            except json.JSONDecodeError:
-                representation['extra_features'] = []
-        else:
-            representation['extra_features'] = []
-        
+        representation['extra_features'] = json.loads(instance.extra_features) if instance.extra_features else []
+
         return representation
 
     def create(self, validated_data):
         images = validated_data.pop('images', None)
         if images:
             validated_data['images'] = ','.join(images)
-        
+
         # Serialize extra_features list of objects to JSON string
         extra_features = validated_data.pop('extra_features', None)
         if extra_features is not None:
@@ -73,7 +73,7 @@ class ProductSerializer(serializers.ModelSerializer):
         images = validated_data.pop('images', None)
         if images:
             validated_data['images'] = ','.join(images)
-        
+
         # Serialize extra_features list of objects to JSON string
         extra_features = validated_data.pop('extra_features', None)
         if extra_features is not None:

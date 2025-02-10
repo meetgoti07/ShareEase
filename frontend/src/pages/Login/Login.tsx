@@ -1,4 +1,4 @@
-import {LoginForm} from "@/components/login-form.tsx";
+import {LoginFormUser} from "@/components/login-form-user.tsx";
 import {GalleryVerticalEnd} from "lucide-react";
 
 export default function Login() {
@@ -14,7 +14,7 @@ export default function Login() {
                     </div>
                     Share Ease
                 </a>
-                <LoginForm/>
+                <LoginFormUser/>
             </div>
         </div>
     )

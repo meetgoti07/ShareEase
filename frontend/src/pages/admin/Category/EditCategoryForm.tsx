@@ -10,10 +10,10 @@ import {
     FormLabel,
     FormControl,
     FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { categorySchema } from "../schema.ts";
+} from "@/components/ui/form.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { categorySchema } from "../../shop/schema.ts";
 import { useEffect, useRef } from "react";
 
 type CategoryFormValues = z.infer<typeof categorySchema>;

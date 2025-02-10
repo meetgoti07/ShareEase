@@ -1,5 +1,5 @@
 import { useEffect, createContext, useState } from 'react'
-import { getAuth, getConfig } from '../lib/allAuth'
+import { getAuth, getConfig } from '@/lib/allAuth'
 
 export const AuthContext = createContext<any>(null)
 

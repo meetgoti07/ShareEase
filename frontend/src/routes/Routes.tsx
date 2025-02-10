@@ -10,14 +10,18 @@ import { useConfig } from '@/auth'
 import Login from "@/pages/Login/Login.tsx";
 import ProviderCallback from "@/pages/Login/ProviderCallback.tsx";
 import {Profile} from "@/pages/Profile/Profile.tsx";
-import {AddProductForm} from "@/pages/shop/Product/AddProduct.tsx";
+import {AddProductForm} from "@/pages/shop/Manage/AddProduct.tsx";
 
 import {Home} from "@/pages/Home.tsx";
 import {Shop} from "@/pages/shop/Product/Shop.tsx";
 import {PropertyList} from "@/pages/rent/Rent.tsx";
-import AddCategory from "@/pages/shop/Category/Categories.tsx";
+import AddCategory from "@/pages/admin/Category/Categories.tsx";
 import {ShowProduct} from "@/pages/shop/Product/ShowProduct.tsx";
 import {AddPropertyForm} from "@/pages/rent/AddProperty.tsx";
+import ShowProperty from "@/pages/rent/ShowProperty.tsx";
+import AdminLogin from "@/pages/admin/Login/AdminLogin.tsx";
+import ProductList from "@/pages/shop/Manage/ProductList.tsx";
+import {EditProduct} from "@/pages/shop/Manage/EditProduct.tsx";
 
 function createRouter(): ReturnType<typeof createBrowserRouter> {
     const routes: RouteObject[] = [
@@ -31,7 +35,7 @@ function createRouter(): ReturnType<typeof createBrowserRouter> {
                 },
                 {
                     path: '/login',
-                    element: <AnonymousRoute><Login /></AnonymousRoute>
+                    element: <AnonymousRoute><Login/></AnonymousRoute>
                 },
                 {
                     path: '/account/provider/callback',
@@ -46,6 +50,14 @@ function createRouter(): ReturnType<typeof createBrowserRouter> {
                     element: <AuthenticatedRoute><AddProductForm /></AuthenticatedRoute>
                 },
                 {
+                    path: '/sell/edit-product/:id',
+                    element: <AuthenticatedRoute><EditProduct /></AuthenticatedRoute>
+                },
+                {
+                    path: '/sell',
+                    element: <AuthenticatedRoute><ProductList /></AuthenticatedRoute>
+                },
+                {
                     path: '/shop/:id',
                     element: <AuthenticatedRoute><ShowProduct /></AuthenticatedRoute>
                 },
@@ -58,8 +70,17 @@ function createRouter(): ReturnType<typeof createBrowserRouter> {
                     element:<AuthenticatedRoute><PropertyList/></AuthenticatedRoute>
                 },
                 {
+                    path:'/rent/:id',
+                    element:<AuthenticatedRoute><ShowProperty/></AuthenticatedRoute>
+                },
+
+                {
                     path:'/rent/add-property',
                     element:<AuthenticatedRoute><AddPropertyForm/></AuthenticatedRoute>
+                },
+                {
+                    path:"/admin/login",
+                    element:<AnonymousRoute><AdminLogin/></AnonymousRoute>
                 },
                 {
                     path:"/admin/add-category",

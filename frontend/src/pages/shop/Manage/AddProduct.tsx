@@ -40,7 +40,6 @@ const productSchema = z.object({
     quantity: z.number().min(0, "Quantity cannot be negative").default(0),
     mrp: z.number().min(0, { message: "MRP cannot be negative." }),
     selling_price: z.number().min(0, { message: "Price cannot be negative." }),
-    is_ad: z.boolean().default(false),
     images: z.array(z.instanceof(File)).min(1, { message: "At least one image is required" }),
     extra_features: z.array(
         z.object({
@@ -68,7 +67,6 @@ export function AddProductForm() {
             quantity: 0,
             mrp: 0,
             selling_price: 0,
-            is_ad: false,
             images: [],
             extra_features: [],
         },
@@ -94,6 +92,8 @@ export function AddProductForm() {
 
     useEffect(() => {
         // Fetch categories from API
+
+
         async function fetchCategories() {
             try {
                 const data = await getCategories();
@@ -156,7 +156,6 @@ export function AddProductForm() {
                     description: "Wait For Approval"
 
                 })
-                //reset the form
                 form.reset();
             }
         } catch (error) {
@@ -168,10 +167,9 @@ export function AddProductForm() {
         }
     }
 
-
     return (
         <Layout>
-            <div className='p-2 w-3/4'>
+            <div className="p-2 w-full sm:w-3/4 lg:w-2/3 mx-auto">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         {/* Title */}
@@ -204,58 +202,54 @@ export function AddProductForm() {
                             )}
                         />
 
-                        {/* Category Select */}
-                        <div className='grid grid-cols-2 gap-4'>
-                        <FormField
-                            control={form.control}
-                            name="category"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Category</FormLabel>
-                                    <FormControl>
-                                        <select {...field} className="w-full p-2 border rounded">
-                                            <option value="">Select a category</option>
-                                            {categories.map(category => (
-                                                <option key={category.id} value={category.id}>
-                                                    {category.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {/* Category & Brand */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="category"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Category</FormLabel>
+                                        <FormControl>
+                                            <select {...field} className="w-full p-2 border rounded">
+                                                <option value="">Select a category</option>
+                                                {categories.map(category => (
+                                                    <option key={category.id} value={category.id}>
+                                                        {category.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        {/* Brand */}
-                        <FormField
-                            control={form.control}
-                            name="brand"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Brand</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Brand name" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="brand"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Brand</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Brand name" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
-                        {/* Pricing Section */}
-                        <div className="grid grid-cols-2 gap-4">
+
+                        {/* Pricing */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
                                 name="mrp"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>MRP (Maximum Retail Price)</FormLabel>
+                                        <FormLabel>MRP</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="text"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
+                                            <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -269,11 +263,7 @@ export function AddProductForm() {
                                     <FormItem>
                                         <FormLabel>Selling Price</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="text"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
+                                            <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -281,28 +271,22 @@ export function AddProductForm() {
                             />
                         </div>
 
-                        {/* Quantity and Ad Checkbox */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="quantity"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Stock Quantity</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                        {/* Quantity */}
+                        <FormField
+                            control={form.control}
+                            name="quantity"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Stock Quantity</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                        {/* Image URLs */}
+                        {/* Image Upload */}
                         <div>
                             <FormField
                                 control={form.control}
@@ -328,7 +312,7 @@ export function AddProductForm() {
                                         <img
                                             src={URL.createObjectURL(file)}
                                             alt={`preview-${index}`}
-                                            className="w-24 h-24 object-cover"
+                                            className="w-24 h-24 object-cover rounded-md"
                                         />
                                         <button
                                             type="button"
@@ -346,7 +330,7 @@ export function AddProductForm() {
                         <div>
                             <h3 className="text-lg font-semibold mb-2">Product Features</h3>
                             {featureFields.map((item, index) => (
-                                <div key={item.id} className="flex gap-2 mb-2">
+                                <div key={item.id} className="flex flex-col sm:flex-row gap-2 mb-2">
                                     <FormField
                                         control={form.control}
                                         name={`extra_features.${index}.key`}
@@ -365,7 +349,7 @@ export function AddProductForm() {
                                         render={({field}) => (
                                             <FormItem className="flex-1">
                                                 <FormControl>
-                                                <Input placeholder="Feature value" {...field} />
+                                                    <Input placeholder="Feature value" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -388,7 +372,7 @@ export function AddProductForm() {
                             </Button>
                         </div>
 
-                        <Button type="submit">Create Product</Button>
+                        <Button type="submit" className="w-full sm:w-auto">Create Product</Button>
                     </form>
                 </Form>
             </div>

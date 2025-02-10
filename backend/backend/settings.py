@@ -32,10 +32,18 @@ INSTALLED_APPS = [
     "allauth.mfa",
     "allauth.headless",
     "allauth.usersessions",
+    "rest_framework.authtoken",
     "user",
     "product",
-    "rent"
+    "property",
+    "admin_panel",
+    "search"
 ]
+import os
+# ✅ Use Traefik Proxy URL for Meilisearch
+MEILISEARCH_URL = "http://meilisearch:7700"
+MEILISEARCH_API_KEY = os.getenv("MEILISEARCH_API_KEY", "8OYFXXO8qCT9JJVKyrbu2F0OssR-DvMbh1Ci5UeoPvE")
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

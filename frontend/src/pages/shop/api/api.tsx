@@ -6,12 +6,20 @@ export const URLs: { [key: string]: string } = Object.freeze({
     // Meta
     CATEGORIES: BASE_URL + 'categories/',
     PRODUCT: BASE_URL + 'products/',
+    SEARCH: BASE_URL + 'search/',
 })
+
 export async function getCategories() {
     return await request('GET', URLs.CATEGORIES);
 }
-export async function getCategory(id) {
+
+export async function getCategory(id:string) {
     return await request('GET', `${URLs.CATEGORIES}${id}/`);
+}
+
+export async function searchProduct(params) {
+
+    return await request('GET', `${URLs.SEARCH}?q=${params}`);
 }
 
 export async function addCategory(data:any) {

@@ -1,4 +1,4 @@
-import { getCSRFToken } from './cerfToken'
+import { getCSRFToken } from './cerfToken.ts'
 
 const Client = Object.freeze({
     APP: 'app',
@@ -106,7 +106,7 @@ const tokenStorage: Storage = window.sessionStorage
 export async function request(
     method: string,
     path: string,
-    data?: never,
+    data?: any,
     headers?: { [key: string]: string }
 ): Promise<never> {
     const options: RequestInit = {
@@ -142,7 +142,7 @@ export async function request(
     if (msg.meta?.session_token) {
         tokenStorage.setItem('sessionToken', msg.meta.session_token)
     }
-    if ([401, 410].includes(msg.status) || (msg.status === 200 && msg.meta?.is_authenticated)) {
+    if ([401, 410].includes(msg.status) || (msg.status === 200 && msg.meta?.is_authenticated) || msg.key) {
         const event = new CustomEvent('allauth.auth.change', { detail: msg })
         document.dispatchEvent(event)
     }
@@ -150,7 +150,7 @@ export async function request(
 }
 
 // API Functions
-export async function login(data: any): Promise<any> {
+export async function login(data: any): Promise<never> {
     return await request('POST', URLs.LOGIN, data)
 }
 
@@ -167,8 +167,7 @@ export async function getAuth () {
     return await request('GET', URLs.SESSION)
 }
 
-export function redirectToProvider (providerId:any , callbackURL:any, process = AuthProcess.LOGIN) {
-    console.log(providerId,callbackURL,process);
+export function redirectToProvider (providerId:string , callbackURL:string, process = AuthProcess.LOGIN) {
     postForm(URLs.REDIRECT_TO_PROVIDER, {
         provider: providerId,
         process,

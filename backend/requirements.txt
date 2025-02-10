@@ -3,3 +3,4 @@ qrcode >= 7.0.0
 psycopg2-binary
 djangorestframework
 dj-rest-auth
+meilisearch

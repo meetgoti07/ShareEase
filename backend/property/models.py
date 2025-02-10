@@ -14,7 +14,7 @@ class Property(models.Model):
     total_vacancy = models.PositiveIntegerField()  # Total number of rooms
     available_vacancy = models.PositiveIntegerField()
     sharing = models.PositiveIntegerField()
-    is_available = models.BooleanField(default=True)  # Availability status
+    is_active = models.BooleanField(default=False)  # Availability status
     custom_features = models.JSONField(blank=True, null=True)  # Store custom fields as a JSON string
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

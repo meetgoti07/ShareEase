@@ -8,14 +8,13 @@ dashboard = true
 
 [accessLog]
 
-
 [providers]
 providersThrottleDuration = 10
+
 [providers.file]
 filename = "traefik.toml"
 directory = "/etc/traefik/"
 watch = true
-
 
 [entryPoints]
 [entryPoints.web]
@@ -23,21 +22,37 @@ address = ":10000"
 
 [http.routers]
 
+# Django Router (Backend)
 [http.routers.django]
 service = "django"
 rule = "PathPrefix(`/accounts`) || PathPrefix(`/_allauth`)"
 entrypoints = ["web"]
 
+# React Router (Frontend)
 [http.routers.react]
 service = "react"
 rule = "PathPrefix(`/`)"
 entrypoints = ["web"]
 
+# ✅ Meilisearch Router (NEW)
+[http.routers.meilisearch]
+service = "meilisearch"
+rule = "PathPrefix(`/_search`)"  # Requests to /_search/ will go to Meilisearch
+entrypoints = ["web"]
 
 [http.services]
+
+# React Service (Frontend)
 [http.services.react.loadBalancer]
 [[http.services.react.loadBalancer.servers]]
 url = "http://frontend:3000"
+
+# Django Service (Backend)
 [http.services.django.loadBalancer]
 [[http.services.django.loadBalancer.servers]]
 url = "http://backend:8000"
+
+# ✅ Meilisearch Service (NEW)
+[http.services.meilisearch.loadBalancer]
+[[http.services.meilisearch.loadBalancer.servers]]
+url = "http://meilisearch:7700"

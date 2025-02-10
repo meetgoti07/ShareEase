@@ -3,7 +3,7 @@ import {
     useLocation
 } from 'react-router-dom'
 import { useAuthChange, AuthChangeEvent, useAuthStatus } from './hooks.tsx'
-import { Flows, AuthenticatorType } from '../lib/allAuth'
+import { Flows, AuthenticatorType } from '@/lib/allAuth'
 
 export const URLs: any = Object.freeze({
     LOGIN_URL: '/login',

@@ -28,7 +28,7 @@ class PropertySerializer(serializers.ModelSerializer):
             'total_vacancy',
             'available_vacancy',
             'sharing',
-            'is_available',
+            'is_active',
             'custom_features',
             'created_at',
             'updated_at'

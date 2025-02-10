@@ -3,8 +3,8 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 
-// Import Shadcn UI form components
 import {
     Form,
     FormField,
@@ -13,17 +13,13 @@ import {
     FormControl,
     FormDescription,
     FormMessage,
-} from "@/components/ui/form"; // Adjust the import paths as needed
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {getUserMeta, setUserMeta} from "@/lib/allAuth.tsx";
-import {useEffect} from "react";
+import { getUserMeta, setUserMeta } from "@/lib/allAuth.tsx";
+import { useToast } from "@/hooks/use-toast";
+import { currentTime } from "@/lib/utils.ts";
 
-import { useToast } from "@/hooks/use-toast"
-import {currentTime} from "@/lib/utils.ts";
-
-
-// Define the schema for form validation using zod
 const profileSchema = z.object({
     name: z.string().min(1, { message: "Name is required." }),
     institute: z.string().min(1, { message: "Institute is required." }),
@@ -35,8 +31,8 @@ const profileSchema = z.object({
         .max(15, { message: "Mobile number is too long." }),
 });
 
+type Profile = z.infer<typeof profileSchema>;
 export function ProfileForm() {
-    // Initialize the form with react-hook-form and zod resolver
     const form = useForm<z.infer<typeof profileSchema>>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
@@ -52,122 +48,137 @@ export function ProfileForm() {
 
     useEffect(() => {
         async function fetchData() {
-            const userMeta = await getUserMeta();
-            form.reset(userMeta);
+            try {
+                const userMeta: Profile = await getUserMeta();
+                if (userMeta) {
+                    // Ensure all form fields have string values
+                    const sanitizedData= {
+                        name: userMeta.name ?? "",
+                        institute: userMeta.institute ?? "",
+                        department: userMeta.department ?? "",
+                        division: userMeta.division ?? "",
+                        mobile_number: userMeta.mobile_number ?? "",
+                    };
+                    form.reset(sanitizedData);
+                }
+            } catch (error) {
+                console.error("Error fetching user meta:", error);
+            }
         }
         fetchData();
     }, [form]);
 
-    // Submit handler
     async function onSubmit(values: z.infer<typeof profileSchema>) {
-        const resp:z.infer<typeof profileSchema> = await setUserMeta(values);
-        if(resp.name) {
-            toast({
-                title: "Profile Updated Successfully!",
-                description: currentTime(),
-            })
-        } else {
+        try {
+            const resp: Profile = await setUserMeta(values);
+            if (resp.name || resp.institute || resp.department || resp.division || resp.mobile_number) {
+                toast({
+                    title: "Profile Updated Successfully!",
+                    description: currentTime(),
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Something Unexpected Happened!",
+                    description: currentTime(),
+                });
+            }
+        } catch (error) {
             toast({
                 variant: "destructive",
-                title: "Something Unexpected Happened!",
-                description: currentTime(),
-            })
+                title: "Error updating profile",
+                description: "Please try again later.",
+            });
         }
     }
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
                 {/* Name Field */}
-                <div className='flex gap-3'>
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({field}) => (
-                            <FormItem className='w-full'>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Your Name" {...field} />
-                                </FormControl>
-                                <FormDescription>Your full name.</FormDescription>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Your Name" {...field} value={field.value ?? ""} />
+                            </FormControl>
+                            <FormDescription>Your full name.</FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-                </div>
-                {/* Institute Field */}
-                <div className='flex gap-3'>
+                {/* Institute and Department Fields */}
+                <div className="flex flex-col sm:flex-row gap-3">
                     <FormField
                         control={form.control}
                         name="institute"
-                        render={({field}) => (
-                            <FormItem className='w-1/2'>
+                        render={({ field }) => (
+                            <FormItem className="w-full sm:w-1/2">
                                 <FormLabel>Institute</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Your Institute" {...field} />
+                                    <Input placeholder="Your Institute" {...field} value={field.value ?? ""} />
                                 </FormControl>
                                 <FormDescription>The institute you belong to.</FormDescription>
-                                <FormMessage/>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* Department Field */}
                     <FormField
                         control={form.control}
                         name="department"
-                        render={({field}) => (
-                            <FormItem className='w-1/2'>
+                        render={({ field }) => (
+                            <FormItem className="w-full sm:w-1/2">
                                 <FormLabel>Department</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Your Department" {...field} />
+                                    <Input placeholder="Your Department" {...field} value={field.value ?? ""} />
                                 </FormControl>
                                 <FormDescription>Your department.</FormDescription>
-                                <FormMessage/>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
                 </div>
 
-                {/* Division Field */}
-                <div className='flex gap-3'>
+                {/* Division and Mobile Number Fields */}
+                <div className="flex flex-col sm:flex-row gap-3">
                     <FormField
                         control={form.control}
                         name="division"
-                        render={({field}) => (
-                            <FormItem className='w-1/2'>
+                        render={({ field }) => (
+                            <FormItem className="w-full sm:w-1/2">
                                 <FormLabel>Division</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Your Division" {...field} />
+                                    <Input placeholder="Your Division" {...field} value={field.value ?? ""} />
                                 </FormControl>
                                 <FormDescription>Your division.</FormDescription>
-                                <FormMessage/>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* Mobile Number Field */}
                     <FormField
                         control={form.control}
                         name="mobile_number"
-                        render={({field}) => (
-                            <FormItem className='w-1/2'>
+                        render={({ field }) => (
+                            <FormItem className="w-full sm:w-1/2">
                                 <FormLabel>Mobile Number</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Your Mobile Number" {...field} />
+                                    <Input placeholder="Your Mobile Number" {...field} value={field.value ?? ""} />
                                 </FormControl>
                                 <FormDescription>Your contact number.</FormDescription>
-                                <FormMessage/>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
                 </div>
 
-                    {/* Submit Button */}
-                    <Button type="submit">Update Profile</Button>
+                <Button type="submit">Update Profile</Button>
             </form>
         </Form>
-);
+    );
 }

@@ -2,8 +2,7 @@ import * as React from "react"
 import {
   AudioWaveform, Banknote,
   Command,
-  GalleryVerticalEnd, Home, HousePlus, LandPlot, MessageSquare,
-  Settings2, ShoppingCart,
+  GalleryVerticalEnd, Home, HousePlus, LandPlot, MessageSquare,ShoppingCart
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -68,7 +67,7 @@ const data = {
   sell: [
     {
       title: "Sell Items",
-      url: "/sell/add-product",
+      url: "/sell",
       icon: Banknote,
     },
     {
@@ -81,18 +80,19 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useUser();
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher/>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain data={data} />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={user} />
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+      <Sidebar collapsible="icon" {...props}>
+        <SidebarHeader>
+          <TeamSwitcher />
+        </SidebarHeader>
+        <SidebarContent>
+          <NavMain data={data} />
+        </SidebarContent>
+        <SidebarFooter>
+          <NavUser user={user} />
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
   )
 }

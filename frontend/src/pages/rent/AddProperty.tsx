@@ -1,7 +1,7 @@
 "use client";
 
 import * as z from "zod";
-import { useForm } from "react-hook-form";
+import {useFieldArray, useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -20,7 +20,7 @@ import Layout from "@/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 
 import { v4 as uuidv4 } from 'uuid';
-import {supabase} from "@/pages/shop/Product/AddProduct.tsx";
+import {supabase} from "@/pages/shop/Manage/AddProduct.tsx";
 import {addProperty} from "@/pages/rent/api/api.tsx";
 import {Simulate} from "react-dom/test-utils";
 import error = Simulate.error;
@@ -46,7 +46,7 @@ const propertySchema = z.object({
     ).optional(),
 });
 
-type PropertyFormValues = z.infer<typeof propertySchema>;
+export type PropertyFormValues = z.infer<typeof propertySchema>;
 
 export function AddPropertyForm() {
     const { toast } = useToast();
@@ -103,6 +103,12 @@ export function AddPropertyForm() {
         return data;
     };
 
+    const { fields: featureFields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "custom_features",
+    });
+
+
     async function onSubmit(values: PropertyFormValues) {
         try {
             console.log("Submitting Property:", values);
@@ -143,20 +149,20 @@ export function AddPropertyForm() {
 
     return (
         <Layout>
-            <div className="p-2 w-3/4">
+            <div className="p-2 w-full sm:w-3/4 lg:w-2/3 mx-auto">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         {/* Title */}
                         <FormField
                             control={form.control}
                             name="title"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Property Title</FormLabel>
                                     <FormControl>
                                         <Input placeholder="e.g., 2 BHK near College" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
@@ -165,13 +171,13 @@ export function AddPropertyForm() {
                         <FormField
                             control={form.control}
                             name="description"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Description</FormLabel>
                                     <FormControl>
                                         <Textarea placeholder="Detailed description of the property" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
@@ -180,33 +186,30 @@ export function AddPropertyForm() {
                         <FormField
                             control={form.control}
                             name="location"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Location</FormLabel>
                                     <FormControl>
                                         <Textarea placeholder="Full address of the property" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
 
                         {/* Rent and Deposit Section */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
                                 name="rent_per_month"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Monthly Rent</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="number"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
+                                            <Input type="number" {...field}
+                                                   onChange={(e) => field.onChange(Number(e.target.value))}/>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -214,38 +217,32 @@ export function AddPropertyForm() {
                             <FormField
                                 control={form.control}
                                 name="security_deposit"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Security Deposit</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="number"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
+                                            <Input type="number" {...field}
+                                                   onChange={(e) => field.onChange(Number(e.target.value))}/>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
                         </div>
 
                         {/* Vacancy and Sharing Section */}
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                             <FormField
                                 control={form.control}
                                 name="total_vacancy"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Total Rooms</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="number"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
+                                            <Input type="number" {...field}
+                                                   onChange={(e) => field.onChange(Number(e.target.value))}/>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -253,17 +250,14 @@ export function AddPropertyForm() {
                             <FormField
                                 control={form.control}
                                 name="available_vacancy"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Available Rooms</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="number"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
+                                            <Input type="number" {...field}
+                                                   onChange={(e) => field.onChange(Number(e.target.value))}/>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -271,44 +265,39 @@ export function AddPropertyForm() {
                             <FormField
                                 control={form.control}
                                 name="sharing"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Sharing (per room)</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="number"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                            />
+                                            <Input type="number" {...field}
+                                                   onChange={(e) => field.onChange(Number(e.target.value))}/>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
                         </div>
 
                         {/* Toggle Switches */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
                                 name="furnished"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                render={({field}) => (
+                                    <FormItem
+                                        className="flex flex-row items-center justify-between rounded-lg border p-4">
                                         <div className="space-y-0.5">
                                             <FormLabel>Furnished</FormLabel>
                                         </div>
                                         <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
+                                            <Switch checked={field.value} onCheckedChange={field.onChange}/>
                                         </FormControl>
                                     </FormItem>
                                 )}
                             />
                         </div>
 
-                        {/* Images */}
+                        {/* Image Upload */}
                         <div>
                             <FormField
                                 control={form.control}
@@ -317,14 +306,9 @@ export function AddPropertyForm() {
                                     <FormItem>
                                         <FormLabel>Upload Property Images</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="file"
-                                                multiple
-                                                accept="image/*"
-                                                onChange={handleFileChange}
-                                            />
+                                            <Input type="file" multiple accept="image/*" onChange={handleFileChange}/>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -334,7 +318,7 @@ export function AddPropertyForm() {
                                         <img
                                             src={URL.createObjectURL(file)}
                                             alt={`preview-${index}`}
-                                            className="w-24 h-24 object-cover"
+                                            className="w-24 h-24 object-cover rounded-md"
                                         />
                                         <button
                                             type="button"
@@ -348,10 +332,56 @@ export function AddPropertyForm() {
                             </div>
                         </div>
 
-                        <Button type="submit">List Property</Button>
+                        <div>
+                            <h3 className="text-lg font-semibold mb-2">Product Features</h3>
+                            {featureFields.map((item, index) => (
+                                <div key={item.id} className="flex flex-col sm:flex-row gap-2 mb-2">
+                                    <FormField
+                                        control={form.control}
+                                        name={`custom_features.${index}.key`}
+                                        render={({field}) => (
+                                            <FormItem className="flex-1">
+                                                <FormControl>
+                                                    <Input placeholder="Feature name" {...field} />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`custom_features.${index}.value`}
+                                        render={({field}) => (
+                                            <FormItem className="flex-1">
+                                                <FormControl>
+                                                    <Input placeholder="Feature value" {...field} />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        onClick={() => remove(index)}
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            ))}
+                            <Button
+                                type="button"
+                                onClick={() => append({key: "", value: ""})}
+                            >
+                                Add Feature
+                            </Button>
+                        </div>
+
+                        <Button type="submit" className="w-full sm:w-auto">List Property</Button>
                     </form>
                 </Form>
             </div>
         </Layout>
+
     );
 }
