@@ -1,19 +1,26 @@
 import Layout from "@/layout/Layout.tsx";
-import {deleteProduct, getProducts} from "@/pages/shop/api/api.tsx";
-import { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge"
+import {deleteProduct, getMyProducts} from "@/pages/shop/api/api.tsx";
+import {useEffect, useState} from "react";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge"
 import {Product} from "@/pages/shop/schema.ts";
 import {useNavigate} from "react-router-dom";
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from "@/components/ui/alert-dialog.tsx";
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        getProducts().then((data) => {
+        getMyProducts().then((data) => {
             setProducts(data);
         });
     }, []);
@@ -23,10 +30,15 @@ export default function ProductList() {
         navigate(`edit-product/${id}`);
     };
 
-    const handleDelete = async (id:number) => {
-        await deleteProduct(id);
-        setProducts(products.filter((product: Product) => product.id.toString() !== id.toString()));
-    };
+const handleDelete = async (id: number) => {
+
+    await deleteProduct(id);
+    setProducts((prevProducts) => {
+        return prevProducts.filter((product: Product) => product.id !== id);
+    });
+};
+
+
 
 
     return (
@@ -42,7 +54,6 @@ export default function ProductList() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>ID</TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Brand</TableHead>
                                 <TableHead>Price</TableHead>
@@ -54,13 +65,12 @@ export default function ProductList() {
                         <TableBody>
                             {products.map((product:Product) => (
                                 <TableRow key={product.id}>
-                                    <TableCell>{product.id}</TableCell>
                                     <TableCell>{product.title}</TableCell>
                                     <TableCell>{product.brand}</TableCell>
                                     <TableCell>₹{product.selling_price}</TableCell>
                                     <TableCell>
-                                        <Badge variant={product.is_available ? "default" : "secondary"}>
-                                            {product.is_available ? "Approved" : "Pending"}
+                                        <Badge variant={product.is_active ? "default" : "secondary"}>
+                                            {product.is_active ? "Approved" : "Pending"}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
@@ -70,7 +80,24 @@ export default function ProductList() {
                                     </TableCell>
                                     <TableCell>
                                         <Button variant="outline" className="mr-2" onClick={() => handleEdit(product.id)}>Edit</Button>
-                                        <Button variant="destructive" onClick={() => handleDelete(product.id)}>Delete</Button>
+                                        <AlertDialog>
+                                          <AlertDialogTrigger asChild>
+                                            <Button variant="destructive">Delete</Button>
+                                          </AlertDialogTrigger>
+                                          <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                              <AlertDialogDescription>
+                                                This action cannot be undone. This will permanently delete your
+                                                product.
+                                              </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                              <AlertDialogAction className={'bg-destructive'} onClick={() => handleDelete(product.id)}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                          </AlertDialogContent>
+                                        </AlertDialog>
                                     </TableCell>
                                 </TableRow>
                             ))}

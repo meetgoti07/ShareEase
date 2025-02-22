@@ -18,7 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import Layout from "@/layout/Layout.tsx";
 import { addCategory, getCategories, editCategory, deleteCategory } from "../api/api.tsx";
 import { EditCategoryForm } from "./EditCategoryForm.tsx";
-import { categorySchema, CategoryFormValues } from "../../shop/schema.ts";
+import {CategoryFormValues, CategorySchema} from "@/Schema/Schema.ts";
 
 export default function ManageCategories() {
     // Fixed the state type to CategoryFormValues[]
@@ -37,7 +37,7 @@ export default function ManageCategories() {
     }, []);
 
     const form = useForm<CategoryFormValues>({
-        resolver: zodResolver(categorySchema),
+        resolver: zodResolver(CategorySchema),
         defaultValues: {
             name: "",
             slug: "",

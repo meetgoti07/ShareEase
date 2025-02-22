@@ -134,7 +134,6 @@ export function AddProductForm() {
 
     async function onSubmit(values: ProductFormValues) {
         try {
-            console.log("Submitting Product:", values);
 
             const imageUrls = await Promise.all(values.images.map(async (file) => {
                 const paths = await uploadImage(file);

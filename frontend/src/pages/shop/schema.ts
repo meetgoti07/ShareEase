@@ -28,7 +28,7 @@ export type Product = {
     created_at: string;
     updated_at: string;
     is_sold: boolean;
-    is_available: boolean;
+    is_active: boolean;
     category: number;
     images: string[];
     extra_features: ExtraFeature[];

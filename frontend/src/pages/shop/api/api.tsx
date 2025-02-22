@@ -7,14 +7,11 @@ export const URLs: { [key: string]: string } = Object.freeze({
     CATEGORIES: BASE_URL + 'categories/',
     PRODUCT: BASE_URL + 'products/',
     SEARCH: BASE_URL + 'search/',
+    MY_PRODUCT: BASE_URL + 'my-products/',
 })
 
 export async function getCategories() {
     return await request('GET', URLs.CATEGORIES);
-}
-
-export async function getCategory(id:string) {
-    return await request('GET', `${URLs.CATEGORIES}${id}/`);
 }
 
 export async function searchProduct(params) {
@@ -22,35 +19,30 @@ export async function searchProduct(params) {
     return await request('GET', `${URLs.SEARCH}?q=${params}`);
 }
 
-export async function addCategory(data:any) {
-    return await request('POST', URLs.CATEGORIES, data);
-}
-
-export async function editCategory(id, data) {
-    console.log(data);
-    return await request('PUT', `${URLs.CATEGORIES}${id}/`, data);
-}
-
-
-export async function deleteCategory(id) {
-    return await request('DELETE', `${URLs.CATEGORIES}${id}/`);
-}
-
-
-export async function addProduct(data :any) {
-    return await request('POST', URLs.PRODUCT, data);
-}
-
 
 export async function getProducts() {
     return await request('GET', URLs.PRODUCT);
 }
+
 export async function getProduct(id) {
     return await request('GET', `${URLs.PRODUCT}${id}/`);
 }
+
+export async function getMyProducts() {
+    return await request('GET', URLs.MY_PRODUCT);
+}
+
+export async function getMyProduct(id) {
+    return await request('GET', `${URLs.MY_PRODUCT}${id}/`);
+}
+
+export async function addProduct(data :any) {
+    return await request('POST', URLs.MY_PRODUCT, data);
+}
+
 export async function editProduct(id, data) {
-    return await request('PUT', `${URLs.PRODUCT}${id}/`, data);
+    return await request('PATCH', `${URLs.MY_PRODUCT}${id}/`, data);
 }
 export async function deleteProduct(id) {
-    return await request('DELETE', `${URLs.PRODUCT}${id}/`);
+    return await request('DELETE', `${URLs.MY_PRODUCT}${id}/`);
 }

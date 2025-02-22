@@ -10,5 +10,4 @@ urlpatterns = [
     path("_allauth/api/", include("product.urls")),
     path("_allauth/api/", include("property.urls")),
     path("_allauth/api/", include("search.urls")),
-    path("_allauth/api/", include("admin_panel.urls"))
 ]

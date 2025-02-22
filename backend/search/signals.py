@@ -10,7 +10,7 @@ client = meilisearch.Client(MEILISEARCH_URL, MEILISEARCH_API_KEY)
 
 @receiver(post_save, sender=Product)
 def sync_product_on_save(sender, instance, **kwargs):
-    """Automatically index product in Meilisearch after saving."""
+
     client.index("products").add_documents([{
         "id": instance.id,
         "name": instance.name,
@@ -22,5 +22,5 @@ def sync_product_on_save(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=Product)
 def remove_product_from_index(sender, instance, **kwargs):
-    """Remove product from Meilisearch when deleted."""
+
     client.index("products").delete_document(str(instance.id))

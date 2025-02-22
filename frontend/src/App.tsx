@@ -1,5 +1,5 @@
 import {AuthContextProvider} from '@/auth'
-import Routes from './routes/Routes'
+import Routes from './routes/Routes.tsx'
 import { Toaster } from "@/components/ui/toaster"
 
 function App() {

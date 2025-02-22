@@ -134,19 +134,35 @@ export async function request(
         options.body = JSON.stringify(data)
         options.headers['Content-Type'] = 'application/json'
     }
-    const resp = await fetch(path, options)
-    const msg = await resp.json()
-    if (msg.status === 410) {
-        tokenStorage.removeItem('sessionToken')
+    const resp = await fetch(path, options);
+
+    // Check if response body exists and if content-type is JSON
+    const contentType = resp.headers.get("content-type");
+    const hasBody = resp.headers.has("content-length") && parseInt(resp.headers.get("content-length") || "0") > 0;
+
+    let msg = null;
+    if (hasBody && contentType && contentType.includes("application/json")) {
+        try {
+            msg = await resp.json();
+        } catch (error) {
+            console.error("Failed to parse JSON response:", error);
+        }
     }
-    if (msg.meta?.session_token) {
-        tokenStorage.setItem('sessionToken', msg.meta.session_token)
+
+    // Handle cases when msg is null or empty
+    if (msg?.status === 410) {
+        tokenStorage.removeItem('sessionToken');
     }
-    if ([401, 410].includes(msg.status) || (msg.status === 200 && msg.meta?.is_authenticated) || msg.key) {
-        const event = new CustomEvent('allauth.auth.change', { detail: msg })
-        document.dispatchEvent(event)
+    if (msg?.meta?.session_token) {
+        tokenStorage.setItem('sessionToken', msg.meta.session_token);
     }
-    return msg
+    if (msg && ([401, 410].includes(msg.status) || (msg.status === 200 && msg.meta?.is_authenticated) || msg.key)) {
+        const event = new CustomEvent('allauth.auth.change', { detail: msg });
+        document.dispatchEvent(event);
+    }
+
+    return msg;  // Return msg even if it's null to avoid unexpected crashes
+
 }
 
 // API Functions

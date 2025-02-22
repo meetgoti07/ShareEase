@@ -1,7 +1,9 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
 class Category(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Use UUID as primary key
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -11,6 +13,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Use UUID as primary key
     title = models.CharField(max_length=255)
     description = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
@@ -26,6 +29,7 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_sold = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

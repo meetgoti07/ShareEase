@@ -1,88 +1,137 @@
-# views.py
-from rest_framework.views import APIView
+from rest_framework import generics, permissions
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
 
-class CategoryListCreate(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        categories = Category.objects.all()
-        serializer = CategorySerializer(categories, many=True)
-        return Response(serializer.data)
+from .models import Product, Category
+from .serializers import ProductSerializer, CategorySerializer
 
-    def post(self, request):
-        serializer = CategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CategoryDetail(APIView):
-    permission_classes = [IsAuthenticated]
+class CategoryListView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_object(self, pk):
-        return get_object_or_404(Category, pk=pk)
+class CategoryListCreateView(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
-    def get(self, request, pk):
-        category = self.get_object(pk)
-        serializer = CategorySerializer(category)
-        return Response(serializer.data)
+class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
-    def put(self, request, pk):
-        category = self.get_object(pk)
-        serializer = CategorySerializer(category, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ProductListCreateView(generics.ListCreateAPIView):
+    """
+    For the customer's dashboard (authenticated users).
+    Provides:
+      - GET /products/  -> List current user's products
+      - POST /products/ -> Create a new product
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, pk):
-        category = self.get_object(pk)
-        category.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_queryset(self):
+        return Product.objects.filter(owner=self.request.user, deleted=False)
 
-class ProductListCreate(APIView):
-    permission_classes = [IsAuthenticated]
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
-    def get(self, request):
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True, context={'request': request})
-        return Response(serializer.data)
 
-    def post(self, request):
-        serializer = ProductSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save(owner=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# ✅ Retrieve, Update & Soft-Delete (Requires PK)
+class ProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or soft-delete a product.
+    Provides:
+      - GET /products/<uuid:pk>/ -> Retrieve product if owned by user
+      - PUT/PATCH /products/<uuid:pk>/ -> Update product
+      - DELETE /products/<uuid:pk>/ -> Soft-delete product
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "pk"  # Explicitly specify that 'pk' is used
 
-class ProductDetail(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Product.objects.filter(owner=self.request.user, deleted=False)
 
-    def get_object(self, pk):
-        return get_object_or_404(Product, pk=pk)
+    def perform_destroy(self, instance):
+        instance.deleted = True
+        instance.save()
 
-    def get(self, request, pk):
-        product = self.get_object(pk)
-        serializer = ProductSerializer(product, context={'request': request})
-        return Response(serializer.data)
 
-    def put(self, request, pk):
-        product = self.get_object(pk)
-        self.check_object_permissions(request, product)
-        serializer = ProductSerializer(product, data=request.data, context={'request': request}, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ShopProductsView(generics.ListAPIView):
+    """
+    For the public shop listing (no auth required).
+    Provides:
+      - GET /shop-products/ -> List all products where:
+           deleted=False, is_active=True, is_sold=False
+         Strips out 'is_sold' from each product's output.
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, pk):
-        product = self.get_object(pk)
-        self.check_object_permissions(request, product)
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_queryset(self):
+        return Product.objects.filter(deleted=False, is_active=True, is_sold=False)
+
+    def list(self, request, *args, **kwargs):
+        # Use the default list behavior
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        data = serializer.data
+
+        # Exclude `is_sold` from each product
+        for product in data:
+            product.pop('is_sold', None)
+
+        return Response(data)
+
+
+class ShopProductDetailView(generics.RetrieveAPIView):
+    """
+    For retrieving a single product for the shop.
+    Provides:
+      - GET /shop-products/<uuid:pk>/
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Product.objects.filter(deleted=False, is_active=True, is_sold=False)
+
+    def retrieve(self, request, *args, **kwargs):
+        # Use default retrieve and then strip out is_sold
+        response = super().retrieve(request, *args, **kwargs)
+        data = response.data
+        data.pop('is_sold', None)
+        return Response(data)
+
+
+class AdminListCreateProductView(generics.ListCreateAPIView):
+    """
+    For admins with full CRUD access (including hard deletes).
+    Provides:
+      - GET /admin/product/              -> List all products (no filter)
+      - POST /admin/product/             -> Create
+    """
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+    permission_classes = [permissions.IsAdminUser]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class AdminDetailedProductView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    For admins with full CRUD access (including hard deletes).
+    Provides:
+      - GET /admin/product/<uuid:pk>/    -> Retrieve
+      - PUT/PATCH /admin/product/<uuid:pk>/ -> Update
+      - DELETE /admin/product/<uuid:pk>/ -> Hard delete
+    """
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+    permission_classes = [permissions.IsAdminUser]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

@@ -31,9 +31,11 @@ class PropertySerializer(serializers.ModelSerializer):
             'is_active',
             'custom_features',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'deleted'
+
         ]
-        read_only_fields = ['id', 'owner_name', 'owner_email', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'owner_name', 'owner_email', 'created_at', 'updated_at', 'deleted']
 
     def to_representation(self, instance):
         """ Convert stored comma-separated image URLs to a list when retrieving data """

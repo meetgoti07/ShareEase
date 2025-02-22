@@ -34,7 +34,7 @@ export function LoginForm({
       const response : Token = await adminLogin({ email, password })
 
       if(response.key) {
-        window.location.href = "/admin/add-category"
+        window.location.href = "/admin/categories"
       }
 
       if (!response) {

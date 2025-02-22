@@ -1,6 +1,5 @@
 "use client";
 
-import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -13,10 +12,8 @@ import {
 } from "@/components/ui/form.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { categorySchema } from "../../shop/schema.ts";
+import { categorySchema, CategoryFormValues } from "../../shop/schema.ts";
 import { useEffect, useRef } from "react";
-
-type CategoryFormValues = z.infer<typeof categorySchema>;
 
 interface EditCategoryFormProps {
     initialData?: CategoryFormValues;

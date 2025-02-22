@@ -16,8 +16,7 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
     volumes:
-      - ./backend/backend:/code/backend/
-      - ../../allauth:/code/allauth
+      - ./backend:/code
     ports:
       - 8000:8000
     depends_on:

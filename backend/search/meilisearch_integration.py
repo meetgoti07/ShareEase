@@ -7,6 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from product.models import Product
 
+
 def format_decimal(value):
     if isinstance(value, Decimal):
         return float(value)

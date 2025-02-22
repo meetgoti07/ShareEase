@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -23,6 +23,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FilterIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import {Input} from "@/components/ui/input.tsx";
 
 
 const Filter = ({ products  , onFilterChange }) => {
@@ -32,9 +33,9 @@ const Filter = ({ products  , onFilterChange }) => {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [sortBy, setSortBy] = useState("");
     const [inStock, setInStock] = useState(false);
+    const priceChange = useRef(false);
 
-    // Derived values from products
-    const [minPrice, setMinPrice] = useState(0);
+    // Derived values from product
     const [maxPrice, setMaxPrice] = useState(0);
     const [availableBrands, setAvailableBrands] = useState([]);
     const [availableCategories, setAvailableCategories] = useState([]);
@@ -44,11 +45,9 @@ const Filter = ({ products  , onFilterChange }) => {
         if (products.length > 0) {
             // Get price range
             const prices = products.map(p => parseFloat(p.selling_price));
-            const min = Math.floor(Math.min(...prices));
             const max = Math.ceil(Math.max(...prices));
-            setMinPrice(min);
             setMaxPrice(max);
-            setPriceRange([min, max]);
+            setPriceRange([0, max]);
 
             // Get unique brands
             const brands = [...new Set(products.map(p => p.brand.toLowerCase()))];
@@ -84,11 +83,20 @@ const Filter = ({ products  , onFilterChange }) => {
                 : [...prev, category]
         );
     };
+    const handleMinPriceChange = (e) => {
+        let value = parseInt(e.target.value, 10) || 0;
+        if (value < 0) value = 0;
+        if (value > priceRange[1]) value = priceRange[1];
+        priceChange.current = true;
+        setPriceRange([value, priceRange[1]]);
+  };
 
-
-    const formatCurrency = (value) => {
-        return `₹${value.toLocaleString('en-IN')}`;
-    };
+  const handleMaxPriceChange = (e) => {
+        let value = parseInt(e.target.value, 10) || maxPrice;
+        if (value > maxPrice) value = maxPrice;
+        if (value < priceRange[0]) value = priceRange[0];
+        setPriceRange([priceRange[0], value]);
+  };
 
     return (
         <Sheet>
@@ -126,21 +134,37 @@ const Filter = ({ products  , onFilterChange }) => {
                         <Separator/>
 
                         {/* Dynamic Price Range */}
-                        <div className="space-y-2">
-                            <Label>Price Range</Label>
-                            <div className="pt-2">
-                                <Slider
-                                    min={minPrice}
-                                    max={maxPrice}
-                                    step={Math.ceil((maxPrice - minPrice) / 100)}
-                                    value={priceRange}
-                                    onValueChange={setPriceRange}
+                        <div>
+                          <Label>Price Range</Label>
+                          <div className="flex flex-col">
+                            <div className="flex gap-6">
+                              <div>
+                                <Label>Min Price</Label>
+                                <Input
+                                  type="number"
+                                  value={priceRange[0]}
+                                  onChange={handleMinPriceChange}
+                                  min={0}
+                                  max={maxPrice}
+                                  className="w-24"
                                 />
-                                <div className="flex justify-between mt-2 text-sm">
-                                    <span>{formatCurrency(priceRange[0])}</span>
-                                    <span>{formatCurrency(priceRange[1])}</span>
-                                </div>
+                              </div>
+                              <div>
+                                <Label>Max Price</Label>
+                                <Input
+                                  type="number"
+                                  value={priceRange[1]}
+                                  onChange={handleMaxPriceChange}
+                                  min={0}
+                                  max={maxPrice}
+                                  className="w-24"
+                                />
+                              </div>
                             </div>
+                            <div className="text-sm text-gray-500">
+                              Range: {0} - {maxPrice}
+                            </div>
+                          </div>
                         </div>
 
                         <Separator/>
@@ -232,7 +256,7 @@ const Filter = ({ products  , onFilterChange }) => {
 
                 <SheetFooter className="pt-4">
                     <div className="w-full space-y-2">
-                        {(selectedBrands.length > 0 || selectedCategories.length > 0 || inStock || sortBy ) && (
+                        {(selectedBrands.length > 0 || selectedCategories.length > 0 || inStock || sortBy || priceChange.current == true) && (
                             <Button
                                 variant="outline"
                                 className="w-full"
@@ -241,9 +265,10 @@ const Filter = ({ products  , onFilterChange }) => {
                                     setInStock(false);
                                     setSelectedCategories([]);
                                     setSortBy("");
-                                    setPriceRange([minPrice, maxPrice]);
+                                    setPriceRange([0, maxPrice]);
+                                    priceChange.current = false;
                                     onFilterChange({
-                                        priceRange: [minPrice, maxPrice],
+                                        priceRange: [0, maxPrice],
                                         brands: [],
                                         categories: [],
                                         sortBy: "",

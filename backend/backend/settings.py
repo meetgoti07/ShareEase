@@ -1,9 +1,7 @@
 from pathlib import Path
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -13,7 +11,6 @@ SECRET_KEY = "dummy-secret-key"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 
 
 # Application definition
@@ -36,14 +33,14 @@ INSTALLED_APPS = [
     "user",
     "product",
     "property",
-    "admin_panel",
     "search"
 ]
+
+
 import os
 # ✅ Use Traefik Proxy URL for Meilisearch
 MEILISEARCH_URL = "http://meilisearch:7700"
 MEILISEARCH_API_KEY = os.getenv("MEILISEARCH_API_KEY", "8OYFXXO8qCT9JJVKyrbu2F0OssR-DvMbh1Ci5UeoPvE")
-
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -55,7 +52,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
-
 
 # settings.py
 REST_AUTH_REGISTER_SERIALIZERS = {
@@ -85,24 +81,23 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'neondb',
-#         'USER': 'neondb_owner',
-#         'PASSWORD': 'sQmwZBD36frx',
-#         'HOST': 'ep-snowy-bread-a18qwap4-pooler.ap-southeast-1.aws.neon.tech',
-#         'PORT': '5432',
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'meetgoti',
+        'USER': 'meetgoti',
+        'PASSWORD': '',
+        'HOST': 'host.docker.internal',
+        'PORT': '',
+    }
+}
 
 
 # Password validation
@@ -160,6 +155,7 @@ ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True
 
 HEADLESS_ONLY = True
+
 HEADLESS_FRONTEND_URLS = {
     "account_confirm_email": "/account/verify-email/{key}",
     "account_reset_password": "/account/password/reset",
@@ -171,16 +167,12 @@ HEADLESS_SERVE_SPECIFICATION = True
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
-        # For each OAuth based provider, either add a ``SocialApp``
-        # (``socialaccount`` app) containing the required client
-        # credentials, or list them here:
         "APPS": [
             {
                 "client_id": "1088239542477-5cfu4pf85hv67el4cdteu9odn4cje41r.apps.googleusercontent.com",
                 "secret": "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",
                 "key": "",
                 "settings": {
-                    # You can fine tune these settings per app:
                     "scope": [
                         "profile",
                         "email",
@@ -191,7 +183,6 @@ SOCIALACCOUNT_PROVIDERS = {
                 },
             },
         ],
-        # The following provider-specific settings will be used for all apps:
         "SCOPE": [
             "profile",
             "email",

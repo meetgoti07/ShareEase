@@ -11,11 +11,11 @@ export default defineConfig({
   },
   server : {
     port: 3000,
-    host: true, // This exposes the server to the network
-    open: true, // Optional: opens the browser automatically
-    strictPort: true, // Optional: fails if port 3000 is in use
+    host: true,
+    open: true,
+    strictPort: true,
     watch: {
-      usePolling: true, // Needed for some systems, especially in VMs or containers
+      usePolling: true,
     },
   }
 

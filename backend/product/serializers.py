@@ -3,6 +3,7 @@ from .models import Category, Product
 from django.contrib.auth.models import User
 import json
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -33,7 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
     )
     category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
-        write_only=True  # Accept category ID in request but don't return it
+        write_only=True
     )
 
     class Meta:
@@ -47,6 +48,9 @@ class ProductSerializer(serializers.ModelSerializer):
         # Convert category ID to category name in response
         if instance.category:
             representation['category'] = instance.category.name  # Return category name instead of ID
+
+        if instance.owner:
+                    representation['owner'] = instance.owner.username  # Return category name instead of ID
 
         # Convert comma-separated images string to an array
         representation['images'] = instance.images.split(',') if instance.images else []

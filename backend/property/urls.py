@@ -1,17 +1,26 @@
-# urls.py
 from django.urls import path
 from .views import (
-    PropertyListCreate,
-    PropertyDetail,
-    MyProperties,
-    TogglePropertyAvailability,
+    DashboardPropertyListCreateView,
+    DashboardPropertyRetrieveUpdateDestroyView,
+    ShopPropertiesView,
+    ShopPropertyDetailView,
+    TogglePropertyAvailabilityView,
+    AdminDetailedPropertyView,
+    AdminListCreatePropertyView
 )
 
 urlpatterns = [
-    path('properties/', PropertyListCreate.as_view(), name='property-list-create'),
-    path('properties/<int:pk>/', PropertyDetail.as_view(), name='property-detail'),
-    path('my-properties/', MyProperties.as_view(), name='my-properties'),
-    path('properties/<int:pk>/toggle-availability/',
-         TogglePropertyAvailability.as_view(),
+    # Dashboard endpoints (require authentication and ownership)
+    path('my-properties/', DashboardPropertyListCreateView.as_view(), name='dashboard-property-list-create'),
+    path('my-properties/<uuid:pk>/', DashboardPropertyRetrieveUpdateDestroyView.as_view(),
+         name='dashboard-property-detail'),
+
+    path('admin/properties/<uuid:pk>/toggle-availability/', TogglePropertyAvailabilityView.as_view(),
          name='toggle-property-availability'),
+
+    # Public shop endpoints (read-only)
+    path('properties/', ShopPropertiesView.as_view(), name='shop-properties'),
+    path('properties/<uuid:pk>/', ShopPropertyDetailView.as_view(), name='shop-property-detail'),
+    path('admin/properties/', AdminListCreatePropertyView.as_view(), name='admin-property-list-create'),
+    path('admin/properties/<uuid:pk>/', AdminDetailedPropertyView.as_view(), name='admin-property-detail'),
 ]

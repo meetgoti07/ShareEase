@@ -1,8 +1,10 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
 
 class Property(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Use UUID as primary key
     title = models.CharField(max_length=255)  # E.g., "2 BHK near College"
     description = models.TextField()  # Detailed description of the house
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='houses')
@@ -18,3 +20,4 @@ class Property(models.Model):
     custom_features = models.JSONField(blank=True, null=True)  # Store custom fields as a JSON string
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted = models.BooleanField(default=False)

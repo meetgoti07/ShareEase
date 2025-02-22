@@ -4,7 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 import meilisearch
 from django.conf import settings
 
-# ✅ Initialize Meilisearch client
 client = meilisearch.Client(settings.MEILISEARCH_URL, settings.MEILISEARCH_API_KEY)
 
 class SearchProducts(APIView):
@@ -21,12 +20,11 @@ class SearchProducts(APIView):
             if not results["hits"]:
                 return JsonResponse({"message": "No products found"}, status=200)
 
-            # ✅ Extract only required fields: id, title, and selling_price
             filtered_products = [
                 {
                     "id": product["id"],
                     "title": product["title"],
-                    "selling_price": product.get("selling_price", 0)  # Default to 0 if price is missing
+                    "selling_price": product.get("selling_price", 0)
                 }
                 for product in results["hits"]
             ]

@@ -18,21 +18,12 @@ import { Input } from "@/components/ui/input.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import Layout from "@/layout/Layout.tsx";
-import {editProduct, getProduct} from "@/pages/shop/api/api.tsx";
+import {editProduct, getMyProduct, getProduct} from "@/pages/shop/api/api.tsx";
 
-// import { v4 as uuidv4 } from 'uuid';
+
 import { useToast} from "@/hooks/use-toast.ts";
 import {useParams} from "react-router-dom";
 
-
-// import { createClient } from '@supabase/supabase-js';
-//
-// const supabaseUrl = 'https://puyvmepvpbbvsajxlkju.supabase.co';
-// const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1eXZtZXB2cGJidnNhanhsa2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcwNDE2MDksImV4cCI6MjA1MjYxNzYwOX0.9AHjLae8sgEzV_8B-O_4mRWsQcvb_LtWybCMgy6___I';
-// export const supabase = createClient(supabaseUrl, supabaseKey);
-
-
-// Define the schema for form validation using zod
 const productSchema = z.object({
     title: z.string().min(1, { message: "Title is required." }),
     description: z.string().min(1, { message: "Description is required." }),
@@ -40,6 +31,7 @@ const productSchema = z.object({
     quantity: z.number().min(0, "Quantity cannot be negative").default(0),
     mrp: z.number().min(0, { message: "MRP cannot be negative." }),
     selling_price: z.number().min(0, { message: "Price cannot be negative." }),
+    is_active: z.boolean().default(false),
     extra_features: z.array(
         z.object({
             key: z.string().min(1, "Feature key is required"),
@@ -61,7 +53,7 @@ export function EditProduct() {
         resolver: zodResolver(productSchema),
         defaultValues: async () => {
             if (id) {
-                const data: ProductFormValues = await getProduct(id);
+                const data: ProductFormValues = await getMyProduct(id);
 
                 data.mrp = Math.floor(parseFloat(data.mrp.toString()));
                 data.selling_price = Math.floor(parseFloat(data.selling_price.toString()));
@@ -74,6 +66,7 @@ export function EditProduct() {
                 description: "",
                 brand: "",
                 quantity: 0,
+                is_active: false,
                 mrp: 0,
                 selling_price: 0,
                 extra_features: [],
@@ -89,7 +82,6 @@ export function EditProduct() {
 
     async function onSubmit(values: ProductFormValues) {
         try {
-            console.log("Submitting Product:", values);
 
             const data = await editProduct(id, values);
             if(data) {
