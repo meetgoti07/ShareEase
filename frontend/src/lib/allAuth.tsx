@@ -9,9 +9,10 @@ type ClientType = typeof Client[keyof typeof Client]
 
 const CLIENT: ClientType = Client.BROWSER
 
-const BASE_URL: string = `http://localhost:10000/_allauth/${CLIENT}/v1`
+const BASE_URL: string = `http://localhost:8000/_allauth/${CLIENT}/v1`
 const ACCEPT_JSON: { accept: string } = {
     accept: 'application/json'
+
 }
 
 export const AuthProcess = Object.freeze({
@@ -116,7 +117,7 @@ export async function request(
             ...headers
         }
     }
-
+    options.credentials = 'include'
     if (path !== URLs.CONFIG) {
         if (CLIENT === Client.BROWSER) {
             options.headers['X-CSRFToken'] = getCSRFToken()
@@ -134,6 +135,7 @@ export async function request(
         options.body = JSON.stringify(data)
         options.headers['Content-Type'] = 'application/json'
     }
+
     const resp = await fetch(path, options);
 
     // Check if response body exists and if content-type is JSON

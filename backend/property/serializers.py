@@ -2,15 +2,16 @@ from rest_framework import serializers
 from .models import Property
 import json
 
-class ExtraFeatureSerializer(serializers.Serializer):
+class PropertyExtraFeatureSerializer(serializers.Serializer):
     key = serializers.CharField()
     value = serializers.CharField()
+    ref_name = "PropertyExtraFeature"
 
 class PropertySerializer(serializers.ModelSerializer):
     owner_name = serializers.CharField(source='owner.username', read_only=True)
     owner_email = serializers.CharField(source='owner.email', read_only=True)
     images = serializers.ListField(child=serializers.URLField(), required=False)
-    custom_features = serializers.ListField(child=ExtraFeatureSerializer(), required=False, allow_empty=True)
+    custom_features = serializers.ListField(child=PropertyExtraFeatureSerializer(), required=False, allow_empty=True)
 
     class Meta:
         model = Property

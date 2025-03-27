@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'drf_spectacular',
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -30,10 +31,11 @@ INSTALLED_APPS = [
     "allauth.headless",
     "allauth.usersessions",
     "rest_framework.authtoken",
+    'corsheaders',
     "user",
     "product",
     "property",
-    "search"
+    # "search"
 ]
 
 
@@ -44,6 +46,7 @@ MEILISEARCH_API_KEY = os.getenv("MEILISEARCH_API_KEY", "8OYFXXO8qCT9JJVKyrbu2F0O
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -76,8 +79,20 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "backend.wsgi.application"
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Share Ease API',
+    'DESCRIPTION': 'API Docs to understand the Share Ease API',
+    'VERSION': '0.1.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': "/_allauth/api/",
+    'SCHEMA_COERCE_PATH_PK_SUFFIX': False,
+}
+
+WSGI_APPLICATION = "backend.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -88,20 +103,27 @@ WSGI_APPLICATION = "backend.wsgi.application"
 #     }
 # }
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'meetgoti',
         'USER': 'meetgoti',
         'PASSWORD': '',
-        'HOST': 'host.docker.internal',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+CORS_ALLOW_ALL_ORIGINS = True
+
+ALLOWED_HOSTS = ["localhost","localhost:3000"]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -141,8 +163,6 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-EMAIL_HOST = "mail"
-EMAIL_PORT = 1025
 
 AUTHENTICATION_BACKENDS = ("allauth.account.auth_backends.AuthenticationBackend",)
 

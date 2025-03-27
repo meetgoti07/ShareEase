@@ -7,7 +7,6 @@ from .views import (
     AdminListCreateProductView,
     AdminDetailedProductView
 )
-
 from .views import CategoryDetailView, CategoryListView, CategoryListCreateView
 
 urlpatterns = [

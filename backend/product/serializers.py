@@ -17,6 +17,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ExtraFeatureSerializer(serializers.Serializer):
     key = serializers.CharField()
     value = serializers.CharField()
+    ref_name = "ProductExtraFeature"
 
 class ProductSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
